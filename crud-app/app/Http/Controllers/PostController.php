@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -29,7 +30,28 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'status' => ['required', 'string'],
+            'category' => ['required', 'string'],
+            'image' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+        ]);
+
+        $file = $request->file('image');
+        $filePath = $file->store('posts', 'public');
+
+        Post::create([
+            'user_id' => auth()->user()->id,
+            'title' => $request->title,
+            'slug' => Str::slug($request->title),
+            'content' => $request->content,
+            'status' => $request->status,
+            'category' => $request->category,
+            'image' => $filePath
+        ]);
+
+        return to_route('posts.index')->with('message', 'Post created successfully.');
     }
 
     /**

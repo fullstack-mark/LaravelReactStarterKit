@@ -1,3 +1,4 @@
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -73,7 +74,11 @@ export default function Dashboard() {
                                             onChange={(e) =>
                                                 setData('title', e.target.value)
                                             }
+                                            aria-invalid={
+                                                errors.title ? true : false
+                                            }
                                         />
+                                        <InputError message={errors.title} />
                                     </div>
 
                                     <div className="col-span-2 md:col-span-1">
@@ -89,6 +94,7 @@ export default function Dashboard() {
                                             <SelectTrigger
                                                 className="w-[180px]"
                                                 id="category"
+                                                aria-invalid={!!errors.category}
                                             >
                                                 <SelectValue placeholder="Select Category" />
                                             </SelectTrigger>
@@ -102,6 +108,7 @@ export default function Dashboard() {
                                                 </SelectItem>
                                             </SelectContent>
                                         </Select>
+                                        <InputError message={errors.category} />
                                     </div>
 
                                     <div className="col-span-2 md:col-span-1">
@@ -115,6 +122,7 @@ export default function Dashboard() {
                                             <SelectTrigger
                                                 className="w-[180px]"
                                                 id="status"
+                                                aria-invalid={!!errors.status}
                                             >
                                                 <SelectValue placeholder="Select Status" />
                                             </SelectTrigger>
@@ -128,6 +136,7 @@ export default function Dashboard() {
                                                 </SelectItem>
                                             </SelectContent>
                                         </Select>
+                                        <InputError message={errors.category} />
                                     </div>
                                 </div>
 
@@ -141,7 +150,9 @@ export default function Dashboard() {
                                         onChange={(e) =>
                                             setData('content', e.target.value)
                                         }
+                                        aria-invalid={!!errors.content}
                                     />
+                                    <InputError message={errors.content} />
                                 </div>
 
                                 <div className="mt-4">
@@ -156,7 +167,22 @@ export default function Dashboard() {
                                                 setData('image', file);
                                             }
                                         }}
+                                        aria-invalid={!!errors.image}
                                     />
+                                    <InputError message={errors.image} />
+                                    {data.image && (
+                                        <div className="mt-2">
+                                            <img
+                                                src={URL.createObjectURL(
+                                                    data.image,
+                                                )}
+                                                alt="Preview"
+                                                width={200}
+                                                height={200}
+                                                className="rounded object-cover"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="mt-4 text-end">
