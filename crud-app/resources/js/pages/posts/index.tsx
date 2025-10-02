@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import InertiaPagination from '@/components/ui/inertia-pagination';
 import { Input } from '@/components/ui/input';
 import {
     Table,
@@ -163,6 +164,8 @@ export default function Dashboard({ posts }: { posts: PostsType[] }) {
                             </Table>
                         </CardContent>
                     </Card>
+
+                    <InertiaPagination posts={posts} />
                 </div>
             </div>
         </AppLayout>
