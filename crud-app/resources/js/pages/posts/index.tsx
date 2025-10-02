@@ -49,7 +49,7 @@ interface PostsType {
     total: number;
 }
 
-export default function Dashboard({ posts }: { posts: PostsType[] }) {
+export default function Dashboard({ posts }: { posts: PostsType }) {
     const { flash } = usePage<{ flash: { message?: string } }>().props;
 
     useEffect(() => {
@@ -71,6 +71,13 @@ export default function Dashboard({ posts }: { posts: PostsType[] }) {
     function onSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
         const query = e.target.value;
         handleSearch(query);
+    }
+
+    function deletePost(id: number) {
+        if (confirm('Are you sure do you want to delete it?')) {
+            router.delete(`/posts/${id}`);
+            toast.success('Deleted Successfully!');
+        }
     }
 
     return (
@@ -152,6 +159,9 @@ export default function Dashboard({ posts }: { posts: PostsType[] }) {
                                                 </Button>
 
                                                 <Button
+                                                    onClick={() =>
+                                                        deletePost(post.id)
+                                                    }
                                                     size={'sm'}
                                                     variant={'destructive'}
                                                 >

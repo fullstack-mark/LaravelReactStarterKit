@@ -1,0 +1,220 @@
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Loader2 } from 'lucide-react';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Edit Posts',
+        href: '/posts',
+    },
+];
+
+interface PostDataType {
+    id: number;
+    title: string;
+    category: string;
+    status: string;
+    content: string;
+    image: string;
+}
+
+export default function Dashboard({ postData }: { postData: PostDataType }) {
+    const { data, setData, post, processing } = useForm<{
+        title: string;
+        category: string;
+        status: string;
+        content: string;
+        image: File | null;
+    }>({
+        title: postData.title,
+        category: postData.category,
+        status: postData.category,
+        content: postData.content,
+        image: null,
+    });
+
+    const { errors } = usePage().props;
+
+    function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        router.put(`/posts/${postData.id}`, { ...data });
+    }
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Edit Post" />
+
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <div className="rounded border p-6 shadow-xl">
+                    <div className="mb-5 flex items-center justify-between">
+                        <div className="text-xl text-slate-600">Edit Post</div>
+                        <Button>
+                            <Link href="/posts" prefetch>
+                                Go Back
+                            </Link>
+                        </Button>
+                    </div>
+
+                    <Card>
+                        <CardContent>
+                            <form onSubmit={handleFormSubmit}>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="col-span-2">
+                                        <Label htmlFor="title">Title</Label>
+                                        <Input
+                                            type="text"
+                                            id="title"
+                                            placeholder="Title"
+                                            value={data.title}
+                                            onChange={(e) =>
+                                                setData('title', e.target.value)
+                                            }
+                                            aria-invalid={
+                                                errors.title ? true : false
+                                            }
+                                        />
+                                        <InputError message={errors.title} />
+                                    </div>
+
+                                    <div className="col-span-2 md:col-span-1">
+                                        <Label htmlFor="category">
+                                            Category
+                                        </Label>
+                                        <Select
+                                            value={data.category}
+                                            onValueChange={(value) =>
+                                                setData('category', value)
+                                            }
+                                        >
+                                            <SelectTrigger
+                                                className="w-[180px]"
+                                                id="category"
+                                                aria-invalid={!!errors.category}
+                                            >
+                                                <SelectValue placeholder="Select Category" />
+                                            </SelectTrigger>
+
+                                            <SelectContent>
+                                                <SelectItem value="Marvel">
+                                                    Marvel
+                                                </SelectItem>
+                                                <SelectItem value="DC">
+                                                    DC
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <InputError message={errors.category} />
+                                    </div>
+
+                                    <div className="col-span-2 md:col-span-1">
+                                        <Label htmlFor="status">Status</Label>
+                                        <Select
+                                            value={
+                                                data.status == '1' ? '1' : '0'
+                                            }
+                                            onValueChange={(value) =>
+                                                setData('status', value)
+                                            }
+                                        >
+                                            <SelectTrigger
+                                                className="w-[180px]"
+                                                id="status"
+                                                aria-invalid={!!errors.status}
+                                            >
+                                                <SelectValue>
+                                                    {data.status == '1'
+                                                        ? 'Active'
+                                                        : 'Inactive'}
+                                                </SelectValue>
+                                            </SelectTrigger>
+
+                                            <SelectContent>
+                                                <SelectItem value="1">
+                                                    Active
+                                                </SelectItem>
+                                                <SelectItem value="0">
+                                                    Inactive
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <InputError message={errors.category} />
+                                    </div>
+                                </div>
+
+                                <div className="mt-4">
+                                    <Label htmlFor="content">Content</Label>
+                                    <Textarea
+                                        rows={6}
+                                        id="content"
+                                        placeholder="Type content here ... "
+                                        value={data.content}
+                                        onChange={(e) =>
+                                            setData('content', e.target.value)
+                                        }
+                                        aria-invalid={!!errors.content}
+                                    />
+                                    <InputError message={errors.content} />
+                                </div>
+
+                                <div className="mt-4">
+                                    <Label htmlFor="image">Select Image</Label>
+                                    <Input
+                                        type="file"
+                                        id="image"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                setData('image', file);
+                                            }
+                                        }}
+                                        aria-invalid={!!errors.image}
+                                    />
+                                    <InputError message={errors.image} />
+                                    {postData.image && (
+                                        <div className="mt-2">
+                                            <img
+                                                src={`/storage/${postData.image}`}
+                                                alt="Preview"
+                                                width={200}
+                                                height={200}
+                                                className="rounded object-cover"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="mt-4 text-end">
+                                    <Button
+                                        size={'lg'}
+                                        type="submit"
+                                        disabled={processing}
+                                    >
+                                        {processing && (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        )}
+                                        Update Post
+                                    </Button>
+                                </div>
+                            </form>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </AppLayout>
+    );
+}

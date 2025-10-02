@@ -6,6 +6,7 @@ use App\Models\Post;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -75,7 +76,9 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        return Inertia::render('posts/edit', [
+            'postData' => $post
+        ]);
     }
 
     /**
@@ -83,7 +86,32 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+         $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'status' => ['required', 'string'],
+            'category' => ['required', 'string'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+        ]);
+
+        
+        $filePath = $post->image;
+
+        if($request->has('image') && $request->image !== null){
+            $file = $request->file('image');
+            $filePath = $file->store('posts', 'public');
+            Storage::disk('public')->delete($post->image);
+        }
+
+        $post->update([
+            'title' => $request->title,
+            'content' => $request->content,
+            'status' => $request->status,
+            'category' => $request->category,
+            'image' => $filePath
+        ]);
+
+        return to_route('posts.index')->with('message', 'Post updated successfully.');
     }
 
     /**
@@ -91,6 +119,12 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        if($post->image){
+            Storage::disk('public')->delete($post->image);
+        }
+        $post->delete();
+
+        return to_route('posts.index')->with('message', 'Post deleted successfully.');
+
     }
 }
