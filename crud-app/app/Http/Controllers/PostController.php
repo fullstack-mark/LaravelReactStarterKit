@@ -124,7 +124,5 @@ class PostController extends Controller
         }
         $post->delete();
 
-        return to_route('posts.index')->with('message', 'Post deleted successfully.');
-
     }
 }

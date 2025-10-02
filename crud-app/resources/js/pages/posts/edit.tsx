@@ -42,7 +42,7 @@ export default function Dashboard({ postData }: { postData: PostDataType }) {
     }>({
         title: postData.title,
         category: postData.category,
-        status: postData.category,
+        status: postData.status,
         content: postData.content,
         image: null,
     });
@@ -51,7 +51,10 @@ export default function Dashboard({ postData }: { postData: PostDataType }) {
 
     function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        router.put(`/posts/${postData.id}`, { ...data });
+        router.post(`/posts/${postData.id}`, {
+            _method: 'put',
+            ...data,
+        });
     }
 
     return (
@@ -124,7 +127,7 @@ export default function Dashboard({ postData }: { postData: PostDataType }) {
                                         <Label htmlFor="status">Status</Label>
                                         <Select
                                             value={
-                                                data.status == '1' ? '1' : '0'
+                                                data.status === '1' ? '1' : '0'
                                             }
                                             onValueChange={(value) =>
                                                 setData('status', value)
